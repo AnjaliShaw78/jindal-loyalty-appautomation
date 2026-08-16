@@ -114,50 +114,6 @@ The project follows the **Page Object Model (POM)** design pattern.
 
 ---
 
-## 📁 Project Structure
-
-```text
-JINDAL_LOYALTY_AUTOMATION/
-│
-├── .github/
-│   └── workflows/
-│       └── automation.yml          # GitHub Actions workflow
-│
-├── pages/                          # Page Object Model files
-│   ├── LoginPage.js
-│   ├── HomePage.js
-│   ├── LoyaltyPage.js
-│   ├── RewardsPage.js
-│   └── UploadDocumentPage.js
-│
-├── tests/                          # Test specification files
-│   ├── login.spec.js
-│   ├── loyalty.spec.js
-│   └── rewards.spec.js
-│
-├── utils/                          # Reusable helper methods
-│   └── helpers.js
-│
-├── test-data/                      # Test data
-│   └── testData.js
-│
-├── screenshots/                    # Captured screenshots
-│
-├── allure-results/                 # Raw Allure test results
-│
-├── allure-report/                  # Generated Allure reports
-│
-├── test-results/                   # Test execution artifacts
-│
-├── .gitignore
-├── package.json                    # Dependencies and scripts
-├── package-lock.json
-├── wdio.conf.js                    # WebDriverIO configuration
-└── README.md                       # Project documentation
-```
-
----
-
 ## 📂 Project Structure Explained
 
 ### 🧱 `pages/`
