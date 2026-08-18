@@ -1,0 +1,4 @@
+{
+  "using": "css selector",
+  "value": "new UiSelector().className(\"android.view.View\").instance(7)"
+}

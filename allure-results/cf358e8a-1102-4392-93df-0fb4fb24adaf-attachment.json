@@ -1,0 +1,4 @@
+{
+  "using": "xpath",
+  "value": "//android.view.View[starts-with(@content-desc,\"IN\")]"
+}

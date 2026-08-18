@@ -8,6 +8,11 @@ class LoginPage extends BasePage {
   get passwordInput() { return '//android.widget.EditText[2]'; }
   get loginButton() { return '//*[@content-desc="Continue"]'; }
   get appLogo() { return '//*[@content-desc="Welcome Back,"]'; }
+  constructor() {
+    super();
+    this.invoiceId = null;
+  }
+
 
   async openApp() {
     try {
@@ -112,10 +117,23 @@ class LoginPage extends BasePage {
     throw new Error('Select Point of Sales input field not found or did not accept focus.');
   }
 
-  async selectPointOfSalesInUploadForm(optionText = 'TEST@GMAIL.COM') {
+  async selectPointOfSalesInUploadForm() {
     // Skip the dropdown interaction. The device flow expects the user to upload the document manually,
     // then wait and click Proceed from the upload modal.
-    await browser.pause(13000);
+    const UploadInvoice = await $('android=new UiSelector().description("Please upload an invoice to continue.")');
+  await UploadInvoice.click();
+  const InvoiceDoc = await $('android=new UiSelector().text("Dealer_Aug_Invoice.pdf")');
+  await InvoiceDoc.click();
+    const SelectSales = await $('android=new UiSelector().className("android.view.View").instance(7)');
+    await SelectSales.click();
+    await $(
+    'android=new UiScrollable(new UiSelector().scrollable(true)).scrollToEnd(10)'
+  );
+
+  console.log('Scrolled to the bottom of the page.');
+  const SelectDealer = await $('//*[contains(@content-desc,"Test Pvt Ltd") or contains(@content-desc,"TEST@GMAIL.COM")]');
+  await SelectDealer.click();
+
 
     const proceedSelectors = [
       '//*[@content-desc="Proceed"]',
@@ -137,60 +155,12 @@ class LoginPage extends BasePage {
     throw new Error('Proceed button did not appear after upload.');
   }
 
-  async selectPointOfSalesOption(optionText = 'Test Pvt Ltd') {
-    const selectors = [
-      `//*[@text="${optionText}"]`,
-      `//*[@content-desc="${optionText}"]`,
-      `//*[contains(@text,"${optionText}")]`,
-      `//*[@text="Test Pvt Ltd"]`,
-      `//*[@text="TEST@GMAIL.COM"]`,
-      `//*[contains(@text,"TEST@GMAIL.COM")]`
-    ];
-
-    for (const selector of selectors) {
-      try {
-        const element = await $(selector);
-        await element.waitForDisplayed({ timeout: 10000 });
-        await element.click();
-        return true;
-      } catch (err) {
-        // keep trying
-      }
-    }
-
-    throw new Error(`Point of Sales option '${optionText}' was not found in the dropdown.`);
-  }
-
-  async waitForManualUploadAndProceed() {
-    const proceedSelectors = [
-      '//*[@content-desc="Proceed"]',
-      '//*[@text="Proceed"]',
-      '//*[contains(@text,"Proceed")]'
-    ];
-
-    // The user uploads the document manually from the device. Wait until the app shows the Proceed button.
-    for (const selector of proceedSelectors) {
-      try {
-        const proceed = await $(selector);
-        await proceed.waitForDisplayed({ timeout: 300000 });
-        await proceed.click();
-        return true;
-      } catch (err) {
-        // keep trying
-      }
-    }
-
-    throw new Error('Proceed button did not appear after manual upload.');
-  }
-
   async waitAfterProceedAndClickSave() {
     // After Proceed, the app processes the uploaded invoice and eventually shows a Save button.
-    //await browser.pause(120000);
+    await browser.pause(120000);
 
     const saveSelectors = [
-      '//*[@content-desc="Save"]',
-      '//*[@text="Save"]',
-      '//*[contains(@text,"Save")]'
+      '//android.widget.Button[@content-desc="Save"]',
     ];
 
     for (const selector of saveSelectors) {
@@ -274,7 +244,30 @@ class LoginPage extends BasePage {
     }
   }
   throw new Error('Swipe button/text was not found.');
-}async clickRedeemNow() {
+  
+}async verifyActualAndProvisionalPoints() {
+
+    const elements = await $$('//android.view.View[@content-desc]');
+
+    const values = [];
+
+    for (const element of elements) {
+        const desc = await element.getAttribute('content-desc');
+
+        if (desc) {
+            values.push(desc.trim());
+        }
+    }
+
+    console.log('Actual Points:', values[4]);
+    console.log('Provisional Points:', values[5]);
+
+    expect(values[4]).toMatch(/^\d+(\.\d+)?$/);
+    expect(values[5]).toMatch(/^\d+(\.\d+)?$/);
+
+    return true;
+}
+async clickRedeemNow() {
   const selectors = [
     '//*[@content-desc="Redeem Now"]',
     '//*[@text="Redeem Now"]',
@@ -301,138 +294,98 @@ class LoginPage extends BasePage {
   }
 
   throw new Error('Redeem Now button was not found.');
+  
 }
+async verifyProductSectionVisibleAndClickable() {
+
+  const productSection = await $('//*[contains(@content-desc,"Lifelong Fit Pro Spin Fitness Bike for Home")]');
+  await productSection.click();
+  const AddToCart = await $('android=new UiSelector().description("Add to Cart")');
+  await AddToCart.click();
+  const CloseError = await $('android=new UiSelector().description("OK")');
+  await CloseError.click();
+}
+
 async clickLoyaltyMenu() {
-  const selectors = [
-    '//*[@content-desc="Loyalty"]',
-    '//*[@text="Loyalty"]',
-    '//*[contains(@content-desc,"Loyalty")]',
-    '//*[contains(@text,"Loyalty")]'
-  ];
+    const loyaltyMenu = await $(
+        '//android.widget.ImageView[@content-desc="Loyalty"]'
+    );
 
-  for (const selector of selectors) {
-    try {
-      const loyaltyMenu = await $(selector);
-
-      await loyaltyMenu.waitForDisplayed({
+    await loyaltyMenu.waitForDisplayed({
         timeout: 15000
-      });
+    });
 
-      await loyaltyMenu.click();
+    await loyaltyMenu.click();
 
-      console.log('Loyalty menu clicked.');
-
-      return true;
-    } catch (err) {
-      // Try next selector
-    }
-  }
-
-  throw new Error('Loyalty menu was not found.');
+    console.log('Loyalty menu clicked.');
 }
-async verifyLoyaltyPointsPage() {
+async verifyUpdatedPointsOnLoyaltyPage() {
+  const transaction = await $(
+    '//android.view.View[contains(@content-desc,"TXN ID :") and contains(@content-desc,"Points Type : Provisional")]'
+  );
 
-  const expectedTexts = [
-    'Loyalty Points',
-    'Loyalty Points History',
-    'TXN Type : Credit',
-    'Points Type : Provisional',
-    'Status: Done',
-    'Credit'
-  ];
+  await transaction.waitForDisplayed({
+    timeout: 15000
+  });
 
-  for (const expectedText of expectedTexts) {
+  const transactionText = await transaction.getAttribute('content-desc');
 
-    const selectors = [
-      `//*[@text="${expectedText}"]`,
-      `//*[@content-desc="${expectedText}"]`,
-      `//*[contains(@text,"${expectedText}")]`,
-      `//*[contains(@content-desc,"${expectedText}")]`
-    ];
+  console.log('Loyalty Transaction:', transactionText);
 
-    let found = false;
+  expect(transactionText).toContain('TXN ID :');
+  expect(transactionText).toContain('TXN Type : Credit');
+  expect(transactionText).toContain('Points Type : Provisional');
+  expect(transactionText).toContain('Status: Done');
+  expect(transactionText).toContain('Credit');
 
-    for (const selector of selectors) {
-      try {
+  // Extract and verify the updated points value
+  const pointsMatch = transactionText.match(
+    /Status : Done.*?([+-]?\d+(?:\.\d+)?)\s+Credit/
+  );
 
-        const element = await $(selector);
+  expect(pointsMatch).not.toBeNull();
 
-        await element.waitForDisplayed({
-          timeout: 10000
-        });
+  const updatedPoints = pointsMatch[1];
 
-        await expect(element).toBeDisplayed();
+  console.log('Updated Points:', updatedPoints);
 
-        console.log(`Verified text: ${expectedText}`);
+  return true;
 
-        found = true;
-        break;
+}async ClickOnHomePageMenu(){
+  const HomeMenu = await $('android=new UiSelector().description("Home")');
+  await HomeMenu.click();
 
-      } catch (err) {
-        // Try next selector
-      }
-    }
+}
 
-    if (!found) {
-      throw new Error(
-        `Expected text was not found on Loyalty page: ${expectedText}`
-      );
-    }
-  }
-
-  console.log('All Loyalty Points page texts verified successfully.');
-}async clickProfileIcon() {
-  const selectors = [
-    '//*[@content-desc="Profile"]',
-    '//*[@content-desc="profile"]',
-    '//*[contains(@content-desc,"Profile")]',
-    '//*[contains(@content-desc,"profile")]',
-    '//*[@resource-id="profile"]'
-  ];
-
-  for (const selector of selectors) {
-    try {
-      const profileIcon = await $(selector);
-
-      await profileIcon.waitForDisplayed({
-        timeout: 15000
-      });
+async clickProfileIcon() {
+  const profileIcon = await $('android=new UiSelector().className("android.view.View").instance(4)');
 
       await profileIcon.click();
 
       console.log('Profile icon clicked.');
-      return true;
-
-    } catch (err) {
-      // Try next selector
-    }
-  }
-
-  throw new Error('Profile icon was not found.');
+      return true
 }async scrollToLogout() {
-  try {
-    const element = await $(
-      'android=new UiScrollable(new UiSelector().scrollable(true))' +
-      '.scrollIntoView(new UiSelector().textContains("Logout"))'
-    );
-    await element.waitForDisplayed({ timeout: 10000 });
-    return element;
-  } catch (err) {
-    const element = await $(
-      'android=new UiScrollable(new UiSelector().scrollable(true))' +
-      '.scrollIntoView(new UiSelector().textContains("Log Out"))'
-    );
-    await element.waitForDisplayed({ timeout: 10000 });
-    return element;
-  }
+  await $(
+    'android=new UiScrollable(new UiSelector().scrollable(true)).scrollToEnd(10)'
+  );
+
+  console.log('Scrolled to the bottom of the page.');
+}
+async ClickOnLogout(){
+  const logoutButton = await $('android=new UiSelector().description("Logout")');
+      await logoutButton.waitForDisplayed({
+        timeout: 10000
+      });
+      await logoutButton.click();
+      console.log('Logout button clicked.');
+}
+async ClickOnLogoutConfirmation() {
+  const logoutConfirmButton = await $('android=new UiSelector().description("Logout")');
+  await logoutConfirmButton.click();
+
 }
 
-async clickLogout() {
-  const element = await this.scrollToLogout();
-  await element.click();
-  console.log('Logout button clicked after scrolling.');
-  return true;
-}
+
 async loginAsDealer(email, password) {
     await this.type(this.emailInput, email);
     await browser.pause(400);
@@ -461,27 +414,90 @@ async loginAsDealer(email, password) {
 
     throw new Error('Success popup OK button not found after login.');
   }
-
-  async waitForPendingApprovalStatus(statusText = 'Pending for Dealer Approval') {
-    const selectors = [
-      `//*[@text="${statusText}"]`,
-      `//*[@content-desc="${statusText}"]`,
-      `//*[contains(@text,"Pending")]`,
-      `//*[contains(@text,"Dealer Approval")]`
-    ];
-
-    for (const selector of selectors) {
-      try {
-        const element = await $(selector);
-        await element.waitForDisplayed({ timeout: 20000 });
-        return true;
-      } catch (err) {
-        // keep trying
-      }
-    }
-
-    throw new Error(`Invoice status did not change to '${statusText}'.`);
+  async InvoiceMenu(){
+    const InvoiceButton = await $('android=new UiSelector().description("Invoice")');
+    await InvoiceButton.click();
   }
+  async ViewDetails(){
+    const ViewDetailsButton = await $('android=new UiSelector().description("View Details").instance(0)');
+    await ViewDetailsButton.click();
+  }
+  async ApprovedByDealer() {
+
+  // Get Invoice ID
+  const invoice = await $(
+    '//android.view.View[starts-with(@content-desc,"IN")]'
+  );
+
+  const description = await invoice.getAttribute('content-desc');
+
+  console.log('Invoice Details:', description);
+
+  // Capture Invoice ID directly
+  this.invoiceId = description;
+
+  console.log('Captured Invoice ID:', this.invoiceId);
+
+  // Click Approved By Dealer
+  const ApprovedByDealerButton = await $(
+    'android=new UiSelector().description("Approved By Dealer")'
+  );
+
+  await ApprovedByDealerButton.click();
+
+  console.log('Approved By Dealer clicked.');
+}
+
+
+async verifyInvoiceUnderAdmin() {
+
+  // Check that Invoice ID was captured
+  if (!this.invoiceId) {
+    throw new Error('Invoice ID was not captured.');
+  }
+
+  console.log('Looking for Invoice ID:', this.invoiceId);
+
+  // Click Pending from Admin
+  const AdminButton = await $(
+    'android=new UiSelector().description("Pending from Admin")'
+  );
+
+  await AdminButton.click();
+  await $(
+    'android=new UiScrollable(new UiSelector().scrollable(true)).scrollToEnd(10)'
+  );
+
+  // Click View Details
+  const ViewDetailsButton2 = await $(
+    'android=new UiSelector().description("View Details").instance(0)'
+  );
+
+  await ViewDetailsButton2.click();
+
+  // Find the same Invoice ID
+  const invoice = await $(
+     `//android.view.View[contains(@content-desc,"${this.invoiceId}")]`
+  );
+
+  await invoice.waitForDisplayed({
+    timeout: 15000
+  });
+
+  const adminInvoiceId = await invoice.getAttribute('content-desc');
+
+  console.log('Dealer Invoice ID:', this.invoiceId);
+  console.log('Admin Invoice ID:', adminInvoiceId);
+
+  // Verify both are equal
+  expect(adminInvoiceId).toBe(this.invoiceId);
+
+  console.log(
+    `Invoice is being approved by the dealer: ${this.invoiceId}`
+  );
+
+  return true;
+}
 }
 
 module.exports = new LoginPage();

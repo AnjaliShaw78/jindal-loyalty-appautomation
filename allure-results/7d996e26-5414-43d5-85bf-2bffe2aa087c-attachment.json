@@ -1,0 +1,4 @@
+{
+  "using": "-android uiautomator",
+  "value": "new UiSelector().text(\"Dealer_Aug_Invoice.pdf\")"
+}

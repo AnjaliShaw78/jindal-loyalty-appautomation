@@ -1,0 +1,4 @@
+{
+  "using": "-android uiautomator",
+  "value": "nnew UiSelector().description(\"Approved By Dealer\")"
+}

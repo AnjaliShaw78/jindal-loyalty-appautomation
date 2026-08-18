@@ -27,14 +27,13 @@ describe('Jindal Loyalty mobile flow', () => {
     await browser.takeScreenshot();
     allureReporter.startStep('Upload Invoice');
     await LoginPage.clickUploadDocumentButton();
-
-    console.log('Please upload the document manually from your device now.');
+    await LoginPage.selectPointOfSalesInUploadForm();
     await browser.pause(13000);
-    await LoginPage.waitForManualUploadAndProceed();
     await browser.takeScreenshot();
     // -----------------------------------------------------
     // Step 3 - Submit Invoice
     // -----------------------------------------------------
+    await browser.pause(18000);
     await LoginPage.waitAfterProceedAndClickSave();
     await browser.pause(1000);
     allureReporter.endStep();
@@ -58,17 +57,26 @@ describe('Jindal Loyalty mobile flow', () => {
     allureReporter.startStep('Verify Actual and Provisional Points and Redeem Now');
     await LoginPage.verifyActualAndProvisionalPoints();
     await LoginPage.clickRedeemNow();
+    await LoginPage.verifyProductSectionVisibleAndClickable();
     await LoginPage.goBack();
+    await LoginPage.goBack();
+    
     allureReporter.endStep();
     
     // -----------------------------------------------------
     // Step 5 - Loyalty Points Validation
     // -----------------------------------------------------
     allureReporter.startStep('Verify Loyalty Page Details');
-    await LoginPage.loyaltyMenu.click();
-
+    await LoginPage.clickLoyaltyMenu();
     await browser.takeScreenshot();
     allureReporter.endStep();
+    await LoginPage.ClickOnHomePageMenu();
+    
+    await  LoginPage.clickProfileIcon();
+    await LoginPage.scrollToLogout();
+    await LoginPage.ClickOnLogout();
+    await LoginPage.ClickOnLogoutConfirmation();
+    await browser.pause(2000);
 
     // -----------------------------------------------------
     // Step 6 - Dealer Flow
@@ -82,6 +90,12 @@ describe('Jindal Loyalty mobile flow', () => {
     allureReporter.endStep();
     
     await LoginPage.clickOkOnSuccessPopup2()
+    await LoginPage.InvoiceMenu();
+    await LoginPage.ViewDetails();
+    await LoginPage.ApprovedByDealer();
+    await LoginPage.goBack();
+    await LoginPage.verifyInvoiceUnderAdmin();
+
     
   });
 });

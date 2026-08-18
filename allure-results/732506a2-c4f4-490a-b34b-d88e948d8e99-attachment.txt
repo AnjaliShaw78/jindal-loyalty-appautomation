@@ -1,0 +1,1 @@
+unknown error: WebDriverError: Cannot set AccessibilityNodeInfo's field 'mSealed' to 'true'. Try changing the 'enforceXPath1' driver setting to 'true' in order to workaround the problem. when running "element" with method "POST"

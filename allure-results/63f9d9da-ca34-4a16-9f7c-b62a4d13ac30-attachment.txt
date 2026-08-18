@@ -1,0 +1,1 @@
+invalid selector: WebDriverError: Invalid CSS selector 'new UiSelector().className("android.view.View").instance(7)'. Reason: 'css-selector-parser parse error: Expected rule but "(" found. Pos: 14.' when running "element" with method "POST"

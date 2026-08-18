@@ -1,0 +1,4 @@
+{
+  "using": "xpath",
+  "value": "//*[@text=\"Actual\"]/following::*[@text and string-length(@text) > 0][1]"
+}

@@ -1,0 +1,4 @@
+{
+  "using": "xpath",
+  "value": "//*[contains(@content-desc,\"Lifelong Fit Pro Spin Fitness Bike for Home\")]"
+}

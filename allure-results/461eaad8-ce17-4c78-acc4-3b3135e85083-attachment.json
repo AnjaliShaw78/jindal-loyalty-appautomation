@@ -1,0 +1,65 @@
+{
+  "script": "<script> [152 bytes]",
+  "args": [
+    {
+      "sessionId": "5f1b41a7-1545-4189-953f-959d4c70c78d",
+      "elementId": "00000000-0000-0358-0000-016800000003",
+      "element-6066-11e4-a52e-4f735466cecf": "00000000-0000-0358-0000-016800000003",
+      "selector": "//android.view.View[@index=\"3\"]",
+      "parent": {
+        "sessionId": "5f1b41a7-1545-4189-953f-959d4c70c78d",
+        "capabilities": {
+          "platformName": "Android",
+          "deviceName": "aca58c5f",
+          "automationName": "UiAutomator2",
+          "udid": "aca58c5f",
+          "appPackage": "com.extension.jindal_india",
+          "appActivity": ".MainActivity",
+          "noReset": true,
+          "autoGrantPermissions": true,
+          "newCommandTimeout": 300,
+          "ignoreHiddenApiPolicyError": true,
+          "skipServerInstallation": true,
+          "platform": "LINUX",
+          "webStorageEnabled": false,
+          "takesScreenshot": true,
+          "javascriptEnabled": true,
+          "databaseEnabled": false,
+          "networkConnectionEnabled": true,
+          "locationContextEnabled": false,
+          "warnings": {},
+          "desired": {
+            "platformName": "Android",
+            "deviceName": "RMX3491",
+            "automationName": "UiAutomator2",
+            "udid": "aca58c5f",
+            "appPackage": "com.extension.jindal_india",
+            "appActivity": ".MainActivity",
+            "noReset": true,
+            "autoGrantPermissions": true,
+            "newCommandTimeout": 300,
+            "ignoreHiddenApiPolicyError": true,
+            "skipServerInstallation": true
+          },
+          "deviceUDID": "aca58c5f",
+          "pixelRatio": "3",
+          "statBarHeight": 110,
+          "viewportRect": {
+            "left": 0,
+            "top": 110,
+            "width": 1080,
+            "height": 2302
+          },
+          "deviceApiLevel": 33,
+          "platformVersion": "13",
+          "deviceManufacturer": "realme",
+          "deviceModel": "RMX3491",
+          "deviceScreenSize": "1080x2412",
+          "deviceScreenDensity": 480
+        }
+      },
+      "isReactElement": false,
+      "isShadowElement": false
+    }
+  ]
+}
